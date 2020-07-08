@@ -8,6 +8,8 @@ namespace XsollaSummerSchoolTest.Models
 {
     public class NewsDataContext : DbContext
     {
+        public DbSet<NewsItem> NewsItemSet { get; set; }
+
         public NewsDataContext() : base("NewsDataModelContainer")
         {
 
