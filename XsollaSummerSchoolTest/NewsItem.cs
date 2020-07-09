@@ -11,14 +11,18 @@ namespace XsollaSummerSchoolTest
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.ComponentModel.DataAnnotations;
+
     public partial class NewsItem
     {
         public int Id { get; set; }
+        [Required]
         public string Headline { get; set; }
+        [Required]
         public string Body { get; set; }
         public short RateSum { get; set; }
         public short RateCount { get; set; }
+        [Required]
         public string Category { get; set; }
     }
 }
