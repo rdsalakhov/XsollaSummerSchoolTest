@@ -46,7 +46,10 @@ namespace XsollaSummerSchoolTest.Controllers
 
             if (id != newsItem.Id)
             {
-                return BadRequest();
+                string message = "Id из параметра запроса и Id переданного объекта не совпадают, " +
+                    "возможно переданы не все свойства изменяемого объекта";
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.BadRequest, message);
+                return BadRequest(message);
             }
 
             db.Entry(newsItem).State = EntityState.Modified;

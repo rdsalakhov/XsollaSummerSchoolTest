@@ -17,6 +17,7 @@
     <Property Name="Body" Type="nvarchar(max)" Nullable="false" />
     <Property Name="RateSum" Type="smallint" Nullable="false" />
     <Property Name="RateCount" Type="smallint" Nullable="false" />
+    <Property Name="Category" Type="nvarchar(max)" Nullable="false" />
   </EntityType>
 </Schema></edmx:StorageModels>
     <!-- CSDL content -->
@@ -34,6 +35,7 @@
           <Property Name="Body" Type="String" Nullable="false" />
           <Property Name="RateSum" Type="Int16" Nullable="false" />
           <Property Name="RateCount" Type="Int16" Nullable="false" />
+          <Property Name="Category" Type="String" Nullable="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -49,6 +51,7 @@
           <ScalarProperty Name="Body" ColumnName="Body" />
           <ScalarProperty Name="RateSum" ColumnName="RateSum" />
           <ScalarProperty Name="RateCount" ColumnName="RateCount" />
+          <ScalarProperty Name="Category" ColumnName="Category" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

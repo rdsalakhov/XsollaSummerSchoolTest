@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 07/08/2020 22:34:19
+-- Date Created: 07/09/2020 22:04:20
 -- Generated from EDMX file: \\mac\Home\Desktop\projects\2019-2020\C#\XsollaSummerSchoolTest\XsollaSummerSchoolTest\NewsDataModel.edmx
 -- --------------------------------------------------
 
@@ -22,6 +22,9 @@ GO
 -- Dropping existing tables
 -- --------------------------------------------------
 
+IF OBJECT_ID(N'[dbo].[NewsItemSet]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[NewsItemSet];
+GO
 
 -- --------------------------------------------------
 -- Creating all tables
@@ -33,7 +36,8 @@ CREATE TABLE [dbo].[NewsItemSet] (
     [Headline] nvarchar(max)  NOT NULL,
     [Body] nvarchar(max)  NOT NULL,
     [RateSum] smallint  NOT NULL,
-    [RateCount] smallint  NOT NULL
+    [RateCount] smallint  NOT NULL,
+    [Category] nvarchar(max)  NOT NULL
 );
 GO
 

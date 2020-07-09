@@ -19,5 +19,6 @@ namespace XsollaSummerSchoolTest
         public string Body { get; set; }
         public short RateSum { get; set; }
         public short RateCount { get; set; }
+        public string Category { get; set; }
     }
 }
