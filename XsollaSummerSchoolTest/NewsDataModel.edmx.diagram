@@ -5,7 +5,9 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="54a26d18d36746e8b368222dab435d9f" Name="Diagram1" >
-        <EntityTypeShape EntityType="NewsDataModel.NewsItem" Width="1.5" PointX="5.375" PointY="1.75" />
+        <EntityTypeShape EntityType="NewsDataModel.NewsItem" Width="1.5" PointX="3.625" PointY="1.875" />
+        <EntityTypeShape EntityType="NewsDataModel.Rate" Width="1.5" PointX="6.5" PointY="4.5" />
+        <AssociationConnector Association="NewsDataModel.NewsItemRate" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

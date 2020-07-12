@@ -11,18 +11,21 @@ namespace XsollaSummerSchoolTest
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-
+    
     public partial class NewsItem
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public NewsItem()
+        {
+            this.Rate = new HashSet<Rate>();
+        }
+    
         public int Id { get; set; }
-        [Required]
         public string Headline { get; set; }
-        [Required]
         public string Body { get; set; }
-        public short RateSum { get; set; }
-        public short RateCount { get; set; }
-        [Required]
         public string Category { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Rate> Rate { get; set; }
     }
 }

@@ -7,6 +7,11 @@
     <Schema Namespace="NewsDataModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
   <EntityContainer Name="NewsDataModelStoreContainer">
     <EntitySet Name="NewsItemSet" EntityType="NewsDataModel.Store.NewsItemSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="RateSet" EntityType="NewsDataModel.Store.RateSet" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="NewsItemRate" Association="NewsDataModel.Store.NewsItemRate">
+      <End Role="NewsItem" EntitySet="NewsItemSet" />
+      <End Role="Rate" EntitySet="RateSet" />
+    </AssociationSet>
   </EntityContainer>
   <EntityType Name="NewsItemSet">
     <Key>
@@ -15,16 +20,40 @@
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Headline" Type="nvarchar(max)" Nullable="false" />
     <Property Name="Body" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="RateSum" Type="smallint" Nullable="false" />
-    <Property Name="RateCount" Type="smallint" Nullable="false" />
     <Property Name="Category" Type="nvarchar(max)" Nullable="false" />
   </EntityType>
+  <EntityType Name="RateSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="SessionString" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Mark" Type="smallint" Nullable="false" />
+    <Property Name="NewsItem_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <Association Name="NewsItemRate">
+    <End Role="NewsItem" Type="NewsDataModel.Store.NewsItemSet" Multiplicity="1" />
+    <End Role="Rate" Type="NewsDataModel.Store.RateSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="NewsItem">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Rate">
+        <PropertyRef Name="NewsItem_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
 </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="NewsDataModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
         <EntityContainer Name="NewsDataModelContainer" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="NewsItemSet" EntityType="NewsDataModel.NewsItem" />
+          <EntitySet Name="RateSet" EntityType="NewsDataModel.Rate" />
+          <AssociationSet Name="NewsItemRate" Association="NewsDataModel.NewsItemRate">
+            <End Role="NewsItem" EntitySet="NewsItemSet" />
+            <End Role="Rate" EntitySet="RateSet" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="NewsItem">
           <Key>
@@ -33,10 +62,22 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Headline" Type="String" Nullable="false" />
           <Property Name="Body" Type="String" Nullable="false" />
-          <Property Name="RateSum" Type="Int16" Nullable="false" />
-          <Property Name="RateCount" Type="Int16" Nullable="false" />
           <Property Name="Category" Type="String" Nullable="false" />
+          <NavigationProperty Name="Rate" Relationship="NewsDataModel.NewsItemRate" FromRole="NewsItem" ToRole="Rate" />
         </EntityType>
+        <EntityType Name="Rate">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SessionString" Type="String" Nullable="false" />
+          <Property Name="Mark" Type="Int16" Nullable="false" />
+          <NavigationProperty Name="NewsItem" Relationship="NewsDataModel.NewsItemRate" FromRole="Rate" ToRole="NewsItem" />
+        </EntityType>
+        <Association Name="NewsItemRate">
+          <End Type="NewsDataModel.NewsItem" Role="NewsItem" Multiplicity="1" />
+          <End Type="NewsDataModel.Rate" Role="Rate" Multiplicity="*" />
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -49,12 +90,27 @@
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="Headline" ColumnName="Headline" />
           <ScalarProperty Name="Body" ColumnName="Body" />
-          <ScalarProperty Name="RateSum" ColumnName="RateSum" />
-          <ScalarProperty Name="RateCount" ColumnName="RateCount" />
           <ScalarProperty Name="Category" ColumnName="Category" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
+    <EntitySetMapping Name="RateSet">
+      <EntityTypeMapping TypeName="IsTypeOf(NewsDataModel.Rate)">
+        <MappingFragment StoreEntitySet="RateSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="SessionString" ColumnName="SessionString" />
+          <ScalarProperty Name="Mark" ColumnName="Mark" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <AssociationSetMapping Name="NewsItemRate" TypeName="NewsDataModel.NewsItemRate" StoreEntitySet="RateSet">
+      <EndProperty Name="NewsItem">
+        <ScalarProperty Name="Id" ColumnName="NewsItem_Id" />
+      </EndProperty>
+      <EndProperty Name="Rate">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
   </EntityContainerMapping>
 </Mapping></edmx:Mappings>
   </edmx:Runtime>
