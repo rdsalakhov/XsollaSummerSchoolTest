@@ -101,7 +101,7 @@ namespace XsollaSummerSchoolTest.Controllers
             return CreatedAtRoute("DefaultApi", new { id = newsItem.Id }, newsItem);
         }
 
-        // POST: api/NewsItem/5
+        // POST: api/NewsItem/rate/5
         public IHttpActionResult PostRate(int rate)
         {
             

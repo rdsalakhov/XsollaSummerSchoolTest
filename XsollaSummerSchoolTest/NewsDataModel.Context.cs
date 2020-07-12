@@ -26,5 +26,6 @@ namespace XsollaSummerSchoolTest
         }
     
         public virtual DbSet<NewsItem> NewsItemSet { get; set; }
+        public virtual DbSet<Rate> RateSet { get; set; }
     }
 }
