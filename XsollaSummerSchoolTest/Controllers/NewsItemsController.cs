@@ -17,9 +17,22 @@ namespace XsollaSummerSchoolTest.Controllers
         private NewsDataModelContainer db = new NewsDataModelContainer();
 
         // GET: api/NewsItems
-        public IQueryable<NewsItem> GetNewsItemSet()
+        public HttpResponseMessage GetNewsItemSet()
         {
-            return db.NewsItemSet;
+            var news = db.NewsItemSet;
+            var response = Request.CreateResponse(HttpStatusCode.OK, news);
+            response.Headers.Add("News-count", news.Count().ToString());
+            return response;
+        }
+
+        // GET: api/NewsItems/category
+        public HttpResponseMessage GetNewsItemSet(string category)
+        {
+            var news = db.NewsItemSet.Where(x => x.Category == category);
+            var response = Request.CreateResponse(HttpStatusCode.OK, news);
+            response.Headers.Add("News-count", news.Count().ToString());
+            
+            return response;
         }
 
         // GET: api/NewsItems/5
