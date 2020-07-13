@@ -6,6 +6,7 @@ using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Web.Http.Description;
 using XsollaSummerSchoolTest;
@@ -15,6 +16,9 @@ namespace XsollaSummerSchoolTest.Controllers
     public class NewsItemsController : ApiController
     {
         private NewsDataModelContainer db = new NewsDataModelContainer();
+
+        private static int MaxMark = 10;
+        private static int MinMark = 1;
 
         // GET: api/NewsItems
         public HttpResponseMessage GetNewsItemSet()
@@ -39,7 +43,7 @@ namespace XsollaSummerSchoolTest.Controllers
         [ResponseType(typeof(NewsItem))]
         public IHttpActionResult GetNewsItem(int id)
         {
-            NewsItem newsItem = db.NewsItemSet.First(x => x.Id == id);
+            NewsItem newsItem = db.NewsItemSet.Find(id);
             if (newsItem == null)
             {
                 return NotFound();
@@ -102,10 +106,45 @@ namespace XsollaSummerSchoolTest.Controllers
         }
 
         // POST: api/NewsItem/rate/5
-        public IHttpActionResult PostRate(int rate)
+        public HttpResponseMessage PostRate(int id, short mark)
         {
-            
-            return Ok();
+            NewsItem newsItem = db.NewsItemSet.Find(id);
+            if (newsItem == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }           
+            if (mark > MaxMark || mark < MinMark)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                    $"Mark was out of available range. Mark should be between {MinMark} and {MaxMark}");
+            }
+            CookieHeaderValue cookie = Request.Headers.GetCookies("sessionstring").FirstOrDefault();
+            if (cookie == null)
+            {
+                string sessionString = GetRandomString();
+                newsItem.Rate.Add(new Rate { Mark = mark, SessionString = sessionString });
+                db.SaveChanges();
+                var response = Request.CreateResponse(HttpStatusCode.OK);
+                cookie = new CookieHeaderValue("sessionstring", sessionString); 
+                cookie.Expires = DateTimeOffset.Now.AddDays(1); 
+                cookie.Domain = Request.RequestUri.Host; 
+                cookie.Path = "/";
+                response.Headers.AddCookies(new CookieHeaderValue[] { cookie });
+                return response;
+            }
+            else
+            {
+                if (newsItem.Rate.Any(x => x.SessionString == cookie["sessionstring"].Value))
+                {
+                    return Request.CreateResponse(HttpStatusCode.Forbidden, "Can not rate news item more than once");
+                }
+                else
+                {
+                    newsItem.Rate.Add(new Rate { Mark = mark, SessionString = cookie["sessionstring"].Value });
+                    db.SaveChanges();
+                    return Request.CreateResponse(HttpStatusCode.OK);
+                }
+            }
         }
 
         // DELETE: api/NewsItems/5
@@ -136,6 +175,18 @@ namespace XsollaSummerSchoolTest.Controllers
         private bool NewsItemExists(int id)
         {
             return db.NewsItemSet.Count(e => e.Id == id) > 0;
+        }
+
+        private string GetRandomString()
+        {
+            string s = "";
+            Random rnd = new Random();
+            for (int i = 0; i < 30; i++)
+            {
+                char[] chars = { (char)rnd.Next(48, 58), (char)rnd.Next(65, 91), (char)rnd.Next(97, 122) };
+                s += chars[rnd.Next(0, 3)];
+            }
+            return s;
         }
     }
 }
