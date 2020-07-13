@@ -105,7 +105,7 @@ namespace XsollaSummerSchoolTest.Controllers
             return CreatedAtRoute("DefaultApi", new { id = newsItem.Id }, newsItem);
         }
 
-        // POST: api/NewsItem/rate/5
+        // POST: api/NewsItem/PostRate/5
         public HttpResponseMessage PostRate(int id, short mark)
         {
             NewsItem newsItem = db.NewsItemSet.Find(id);
@@ -161,6 +161,35 @@ namespace XsollaSummerSchoolTest.Controllers
             db.SaveChanges();
 
             return Ok(newsItem);
+        }
+
+        // DELETE: api/NewsItem/DeleteRate/5
+        public HttpResponseMessage DeleteRate(int id)
+        {
+            NewsItem newsItem = db.NewsItemSet.Find(id);
+            if (newsItem == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            CookieHeaderValue cookie = Request.Headers.GetCookies("sessionstring").FirstOrDefault();
+            if (cookie == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "You have not post rate to this news item yet");
+            }
+            else
+            {
+                if (newsItem.Rate.Any(x => x.SessionString == cookie["sessionstring"].Value))
+                {
+                    var rateToRemove = newsItem.Rate.First(x => x.SessionString == cookie["sessionstring"].Value);
+                    db.Entry(rateToRemove).State = EntityState.Deleted;
+                    db.SaveChanges();
+                    return Request.CreateResponse(HttpStatusCode.OK);
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.Forbidden, "You have not post rate to this news item yet");
+                }
+            }
         }
 
         protected override void Dispose(bool disposing)
