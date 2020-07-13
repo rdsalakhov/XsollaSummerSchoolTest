@@ -39,7 +39,7 @@ namespace XsollaSummerSchoolTest.Controllers
         [ResponseType(typeof(NewsItem))]
         public IHttpActionResult GetNewsItem(int id)
         {
-            NewsItem newsItem = db.NewsItemSet.Find(id);
+            NewsItem newsItem = db.NewsItemSet.First(x => x.Id == id);
             if (newsItem == null)
             {
                 return NotFound();
