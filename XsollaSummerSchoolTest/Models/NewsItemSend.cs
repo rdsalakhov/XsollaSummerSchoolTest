@@ -10,6 +10,7 @@ namespace XsollaSummerSchoolTest.Models
         public int Id { get; set; }
         public string Headline { get; set; }
         public string Body { get; set; }
+        public string Category { get; set; }
         public int TotalRate { get; set; }
         public int RateCount { get; set; }
 
@@ -22,6 +23,7 @@ namespace XsollaSummerSchoolTest.Models
                 Id = newsItem.Id,
                 Headline = newsItem.Headline,
                 Body = newsItem.Body,
+                Category = newsItem.Category,
                 TotalRate = totalRate,
                 RateCount = rateCount
             };
