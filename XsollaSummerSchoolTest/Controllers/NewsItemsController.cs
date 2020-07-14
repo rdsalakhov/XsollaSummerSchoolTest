@@ -9,7 +9,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Web.Http.Description;
-using XsollaSummerSchoolTest;
+using XsollaSummerSchoolTest.Models;
 
 namespace XsollaSummerSchoolTest.Controllers
 {
@@ -23,27 +23,40 @@ namespace XsollaSummerSchoolTest.Controllers
         // GET: api/NewsItems
         public HttpResponseMessage GetNewsItemSet()
         {
-            var news = db.NewsItemSet;
+            var rawNews = db.NewsItemSet.ToList();
+            var news = rawNews.Select(x => (NewsItemSend)x);
             var response = Request.CreateResponse(HttpStatusCode.OK, news);
             response.Headers.Add("News-count", news.Count().ToString());
             return response;
         }
 
-        // GET: api/NewsItems/category
+        // GET: api/NewsItems?category
         public HttpResponseMessage GetNewsItemSet(string category)
         {
-            var news = db.NewsItemSet.Where(x => x.Category == category);
+            var news = (IQueryable<NewsItemSend>)db.NewsItemSet.Where(x => x.Category == category);
             var response = Request.CreateResponse(HttpStatusCode.OK, news);
             response.Headers.Add("News-count", news.Count().ToString());
             
             return response;
         }
 
+        // GET: api/NewsItems?LeastAverage
+        public HttpResponseMessage GetNewsItemSet(double leastAverage)
+        {
+            var rawNews = db.NewsItemSet.ToList().Where(x => x.Rate.Count > 0);
+            var news = rawNews.Select(x => (NewsItemSend)x);
+            news = news.Where(x => x.TotalRate / x.RateCount >= leastAverage);
+            var response = Request.CreateResponse(HttpStatusCode.OK, news);
+            response.Headers.Add("News-count", news.Count().ToString());
+
+            return response;
+        }
+
         // GET: api/NewsItems/5
-        [ResponseType(typeof(NewsItem))]
+        [ResponseType(typeof(NewsItemSend))]
         public IHttpActionResult GetNewsItem(int id)
         {
-            NewsItem newsItem = db.NewsItemSet.Find(id);
+            NewsItemSend newsItem = db.NewsItemSet.Find(id);
             if (newsItem == null)
             {
                 return NotFound();
@@ -91,7 +104,7 @@ namespace XsollaSummerSchoolTest.Controllers
         }
 
         // POST: api/NewsItems
-        [ResponseType(typeof(NewsItem))]
+        [ResponseType(typeof(NewsItemSend))]
         public IHttpActionResult PostNewsItem(NewsItem newsItem)
         {
             if (!ModelState.IsValid)
@@ -102,7 +115,7 @@ namespace XsollaSummerSchoolTest.Controllers
             db.NewsItemSet.Add(newsItem);
             db.SaveChanges();
 
-            return CreatedAtRoute("DefaultApi", new { id = newsItem.Id }, newsItem);
+            return CreatedAtRoute("DefaultApi", new { id = newsItem.Id }, (NewsItemSend)newsItem);
         }
 
         // POST: api/NewsItem/PostRate/5
