@@ -31,9 +31,11 @@ namespace XsollaSummerSchoolTest.Controllers
         }
 
         // GET: api/NewsItems?category
+        [Route("api/NewsItems/FindByCategory")]
         public HttpResponseMessage GetNewsItemSet(string category)
         {
-            var news = (IQueryable<NewsItemSend>)db.NewsItemSet.Where(x => x.Category == category);
+            var rawNews = db.NewsItemSet.ToList().Where(x => x.Category == category);
+            var news = rawNews.Select(x => (NewsItemSend)x);
             var response = Request.CreateResponse(HttpStatusCode.OK, news);
             response.Headers.Add("News-count", news.Count().ToString());
             
@@ -41,6 +43,7 @@ namespace XsollaSummerSchoolTest.Controllers
         }
 
         // GET: api/NewsItems?LeastAverage
+        [Route("api/NewsItems/FindTopRated")]
         public HttpResponseMessage GetNewsItemSet(double leastAverage)
         {
             var rawNews = db.NewsItemSet.ToList().Where(x => x.Rate.Count > 0);
