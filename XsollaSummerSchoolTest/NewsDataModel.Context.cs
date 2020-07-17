@@ -16,7 +16,7 @@ namespace XsollaSummerSchoolTest
     public partial class NewsDataModelContainer : DbContext
     {
         public NewsDataModelContainer()
-            : base("name=NewsDataModelContainer")
+            : base("name=AzureDb")
         {
         }
     
