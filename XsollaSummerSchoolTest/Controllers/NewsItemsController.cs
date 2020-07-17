@@ -72,41 +72,32 @@ namespace XsollaSummerSchoolTest.Controllers
         [ResponseType(typeof(void))]
         public IHttpActionResult PutNewsItem(int id, NewsItem newsItem)
         {
+            if (!NewsItemExists(id))
+            {
+                return NotFound();
+            }
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != newsItem.Id)
-            {
-                string message = "Id из параметра запроса и Id переданного объекта не совпадают, " +
-                    "возможно переданы не все свойства изменяемого объекта";
-                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.BadRequest, message);
-                return BadRequest(message);
-            }
+            //if (id != newsItem.Id)
+            //{
+            //    string message = "Id из параметра запроса и Id переданного объекта не совпадают, " +
+            //        "возможно переданы не все свойства изменяемого объекта";
+            //    HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.BadRequest, message);
+            //    return BadRequest(message);
+            //}
 
+            newsItem.Id = id;
             db.Entry(newsItem).State = EntityState.Modified;
 
-            try
-            {
-                db.SaveChanges();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!NewsItemExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            db.SaveChanges();
 
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        // POST: api/NewsItems
+        // POST: api/NewsItems/
         [ResponseType(typeof(NewsItemSend))]
         public IHttpActionResult PostNewsItem(NewsItem newsItem)
         {
@@ -122,6 +113,7 @@ namespace XsollaSummerSchoolTest.Controllers
         }
 
         // POST: api/NewsItem/PostRate/5
+        [Route("api/NewsItems/postrate/{id}")]
         public HttpResponseMessage PostRate(int id, short mark)
         {
             NewsItem newsItem = db.NewsItemSet.Find(id);
@@ -180,6 +172,7 @@ namespace XsollaSummerSchoolTest.Controllers
         }
 
         // DELETE: api/NewsItem/DeleteRate/5
+        [Route("api/NewsItems/deleterate/{id}")]
         public HttpResponseMessage DeleteRate(int id)
         {
             NewsItem newsItem = db.NewsItemSet.Find(id);
