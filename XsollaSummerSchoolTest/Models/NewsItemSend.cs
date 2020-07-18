@@ -16,6 +16,10 @@ namespace XsollaSummerSchoolTest.Models
 
         public static implicit operator NewsItemSend(NewsItem newsItem)
         {
+            if (newsItem == null)
+            {
+                return null;
+            }
             var totalRate = newsItem.Rate.Select(x => int.Parse(x.Mark.ToString())).Sum();
             var rateCount = newsItem.Rate.Count();
             NewsItemSend newsItemSend = new NewsItemSend
