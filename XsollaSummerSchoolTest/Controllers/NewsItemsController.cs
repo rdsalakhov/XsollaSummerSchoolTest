@@ -79,15 +79,7 @@ namespace XsollaSummerSchoolTest.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-            }
-
-            //if (id != newsItem.Id)
-            //{
-            //    string message = "Id из параметра запроса и Id переданного объекта не совпадают, " +
-            //        "возможно переданы не все свойства изменяемого объекта";
-            //    HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.BadRequest, message);
-            //    return BadRequest(message);
-            //}
+            }          
 
             newsItem.Id = id;
             db.Entry(newsItem).State = EntityState.Modified;
@@ -156,7 +148,7 @@ namespace XsollaSummerSchoolTest.Controllers
         }
 
         // DELETE: api/NewsItems/5
-        [ResponseType(typeof(NewsItem))]
+        [ResponseType(typeof(NewsItemSend))]
         public IHttpActionResult DeleteNewsItem(int id)
         {
             NewsItem newsItem = db.NewsItemSet.Find(id);
@@ -168,7 +160,7 @@ namespace XsollaSummerSchoolTest.Controllers
             db.NewsItemSet.Remove(newsItem);
             db.SaveChanges();
 
-            return Ok(newsItem);
+            return Ok((NewsItemSend)newsItem);
         }
 
         // DELETE: api/NewsItem/DeleteRate/5

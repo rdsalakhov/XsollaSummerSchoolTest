@@ -16,13 +16,13 @@ namespace XsollaSummerSchoolTest
     public partial class NewsDataModelContainer : DbContext
     {
         public NewsDataModelContainer()
-            : base("name=AzureDb")
+            : base("name=NewsDataModelContainer")
         {
         }
     
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            //throw new UnintentionalCodeFirstException();
+            throw new UnintentionalCodeFirstException();
         }
     
         public virtual DbSet<NewsItem> NewsItemSet { get; set; }

@@ -2,13 +2,13 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 07/12/2020 21:07:30
+-- Date Created: 07/19/2020 23:19:11
 -- Generated from EDMX file: \\mac\Home\Desktop\projects\2019-2020\C#\XsollaSummerSchoolTest\XsollaSummerSchoolTest\NewsDataModel.edmx
 -- --------------------------------------------------
 
 SET QUOTED_IDENTIFIER OFF;
 GO
-USE [XsollaSummerSchoolTest];
+USE [NewsDb];
 GO
 IF SCHEMA_ID(N'dbo') IS NULL EXECUTE(N'CREATE SCHEMA [dbo]');
 GO
@@ -17,6 +17,9 @@ GO
 -- Dropping existing FOREIGN KEY constraints
 -- --------------------------------------------------
 
+IF OBJECT_ID(N'[dbo].[FK_NewsItemRate]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[RateSet] DROP CONSTRAINT [FK_NewsItemRate];
+GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
@@ -24,6 +27,9 @@ GO
 
 IF OBJECT_ID(N'[dbo].[NewsItemSet]', 'U') IS NOT NULL
     DROP TABLE [dbo].[NewsItemSet];
+GO
+IF OBJECT_ID(N'[dbo].[RateSet]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[RateSet];
 GO
 
 -- --------------------------------------------------
@@ -74,7 +80,7 @@ ADD CONSTRAINT [FK_NewsItemRate]
     FOREIGN KEY ([NewsItem_Id])
     REFERENCES [dbo].[NewsItemSet]
         ([Id])
-    ON DELETE NO ACTION ON UPDATE NO ACTION;
+    ON DELETE CASCADE ON UPDATE NO ACTION;
 GO
 
 -- Creating non-clustered index for FOREIGN KEY 'FK_NewsItemRate'

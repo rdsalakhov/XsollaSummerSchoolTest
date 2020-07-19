@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="NewsDataModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="NewsDataModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
   <EntityContainer Name="NewsDataModelStoreContainer">
     <EntitySet Name="NewsItemSet" EntityType="NewsDataModel.Store.NewsItemSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="RateSet" EntityType="NewsDataModel.Store.RateSet" store:Type="Tables" Schema="dbo" />
@@ -32,7 +32,9 @@
     <Property Name="NewsItem_Id" Type="int" Nullable="false" />
   </EntityType>
   <Association Name="NewsItemRate">
-    <End Role="NewsItem" Type="NewsDataModel.Store.NewsItemSet" Multiplicity="1" />
+    <End Role="NewsItem" Type="NewsDataModel.Store.NewsItemSet" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
     <End Role="Rate" Type="NewsDataModel.Store.RateSet" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="NewsItem">
@@ -75,8 +77,11 @@
           <NavigationProperty Name="NewsItem" Relationship="NewsDataModel.NewsItemRate" FromRole="Rate" ToRole="NewsItem" />
         </EntityType>
         <Association Name="NewsItemRate">
-          <End Type="NewsDataModel.NewsItem" Role="NewsItem" Multiplicity="1" />
-          <End Type="NewsDataModel.Rate" Role="Rate" Multiplicity="*" />
+          <End Type="NewsDataModel.NewsItem" Role="NewsItem" Multiplicity="1" >
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="NewsDataModel.Rate" Role="Rate" Multiplicity="*" >
+          </End>
         </Association>
       </Schema>
     </edmx:ConceptualModels>
