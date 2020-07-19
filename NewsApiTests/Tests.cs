@@ -55,7 +55,6 @@ namespace NewsApiTests
 
             // Assert
             Assert.IsTrue(response.TryGetContentValue<IEnumerable<NewsItemSend>>(out newsItems));
-            Assert.AreEqual(newsItems.First().Id, 1);
         }
 
         [TestMethod]
@@ -204,5 +203,125 @@ namespace NewsApiTests
             // Assert            
             Assert.IsNotNull(result);
         }
+
+        [TestMethod]
+        public void PostRate_NotFound()
+        {
+            // Arrange
+            var controller = new NewsItemsController();
+            controller.Request = new HttpRequestMessage();
+            controller.Configuration = new HttpConfiguration();
+
+            // Act
+            var response = controller.PostRate(-3, 8);
+
+            // Assert            
+            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [TestMethod]
+        public void PostRate_BadRequest()
+        {
+            // Arrange
+            var controller = new NewsItemsController();
+            controller.Request = new HttpRequestMessage();
+            controller.Configuration = new HttpConfiguration();
+
+            // Act
+            var response = controller.PostRate(2, 123);
+
+            // Assert            
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [TestMethod]
+        public void PostRate_Ok()
+        {
+            // Arrange
+            var controller = new NewsItemsController();
+            controller.Request = new HttpRequestMessage();
+            controller.Configuration = new HttpConfiguration();
+            controller.Request.Headers.Add("sessionString", "i71S2pE8tJ5LV0F658HCXK2zF57M3L");
+            controller.Request.RequestUri = new Uri("https://localhost:44341/api/");
+
+            // Act
+            var response = controller.PostRate(2, 8);
+
+            // Assert            
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [TestMethod]
+        public void PostRate_Forbidden()
+        {
+            // Arrange
+            var controller = new NewsItemsController();
+            controller.Request = new HttpRequestMessage();
+            controller.Configuration = new HttpConfiguration();
+            controller.Request.Headers.Add("Cookie", "sessionString=i81S2p54tJ5LV0F658HCXK2zF57M3L");
+            controller.Request.RequestUri = new Uri("https://localhost:44341/api/");
+            controller.PostRate(2, 8);
+
+            // Act
+            var response = controller.PostRate(2, 8);
+
+            // Assert            
+            Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+
+        [TestMethod]
+        public void DeleteRate_Ok()
+        {
+            // Arrange
+            var controller = new NewsItemsController();
+            controller.Request = new HttpRequestMessage();
+            controller.Configuration = new HttpConfiguration();
+            controller.Request.Headers.Add("Cookie", "sessionString=i71S2pE4tJ5LV0F658HCXK2zF57M3L");
+            controller.Request.RequestUri = new Uri("https://localhost:44341/api/");
+            controller.PostRate(2, 8);
+
+            // Act
+            var response = controller.DeleteRate(2);
+
+            // Assert            
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [TestMethod]
+        public void DeleteRate_Forbidden()
+        {
+            // Arrange
+            var controller = new NewsItemsController();
+            controller.Request = new HttpRequestMessage();
+            controller.Configuration = new HttpConfiguration();
+            controller.Request.Headers.Add("Cookie", "sessionString=i81S2pE4tJ5LV0F658HCXK2zF57M3L");
+            controller.Request.RequestUri = new Uri("https://localhost:44341/api/");
+
+            // Act
+            var response = controller.DeleteRate(2);
+
+            // Assert            
+            Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        [TestMethod]
+        public void DeleteRate_NotFound()
+        {
+            // Arrange
+            var controller = new NewsItemsController();
+            controller.Request = new HttpRequestMessage();
+            controller.Configuration = new HttpConfiguration();
+            controller.Request.Headers.Add("Cookie", "sessionString=i81S2pE4tJ5LV0F658HCXK2zF57M3L");
+            controller.Request.RequestUri = new Uri("https://localhost:44341/api/");
+
+            // Act
+            var response = controller.DeleteRate(-1);
+
+            // Assert            
+            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+        }
     }
+
+    
 }
