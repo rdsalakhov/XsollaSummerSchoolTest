@@ -4,6 +4,7 @@ Xsolla summer school backend test task.
 ## Table of Contents
 * [Overview](#Overview)
 * [What is done](#What-is-done)
+* [Usage](#Usage)
 
 ## Overview
 Simple API to add, edit or delete news and download them from server. News also can be rate with mark from 1 to 10.
