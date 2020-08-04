@@ -12,6 +12,7 @@ using XsollaSummerSchoolTest.Models;
 
 namespace NewsApiTests
 {
+    // good idea is to use mock data repository for testing (https://docs.microsoft.com/ru-ru/aspnet/web-api/overview/testing-and-debugging/unit-testing-with-aspnet-web-api)
     [TestClass]
     public class Tests
     {
@@ -27,17 +28,19 @@ namespace NewsApiTests
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNotNull(result.Content);
+            Assert.IsNotNull(result.Content); // nit: might be a good idea to check if item corresponds to the one requested
         }
 
         [TestMethod]
-        public void GetOneNewsItem_NotFound()
+        public void GetOneNewsItem_FailNotFound()
         {
             // Arrange
             var controller = new NewsItemsController();
 
             // Act
             var response = controller.GetNewsItem(-1);
+            
+            // Assert
             Assert.IsInstanceOfType(response, typeof(NotFoundResult));
         }
 
@@ -51,10 +54,10 @@ namespace NewsApiTests
 
             // Act
             var response = controller.GetNewsItemSet();
-            IEnumerable<NewsItemSend> newsItems;
 
             // Assert
-            Assert.IsTrue(response.TryGetContentValue<IEnumerable<NewsItemSend>>(out newsItems));
+            Assert.IsTrue(response.TryGetContentValue<IEnumerable<NewsItemSend>>(out var newsItems));
+            // nit: might be a good idea to check at least the length of the array, not just the success of cast
         }
 
         [TestMethod]
@@ -67,10 +70,9 @@ namespace NewsApiTests
 
             // Act
             var response = controller.GetNewsItemSet("Искусство");
-            IEnumerable<NewsItemSend> newsItems;
 
             // Assert
-            Assert.IsTrue(response.TryGetContentValue<IEnumerable<NewsItemSend>>(out newsItems));
+            Assert.IsTrue(response.TryGetContentValue<IEnumerable<NewsItemSend>>(out var newsItems));
             Assert.AreEqual("Искусство", newsItems.First().Category);
         }
 
@@ -85,34 +87,44 @@ namespace NewsApiTests
 
             // Act
             var response = controller.GetNewsItemSet(leastAverage);
-            IEnumerable<NewsItemSend> newsItems;
-
+            
             // Assert
-            Assert.IsTrue(response.TryGetContentValue<IEnumerable<NewsItemSend>>(out newsItems));
+            Assert.IsTrue(response.TryGetContentValue<IEnumerable<NewsItemSend>>(out var newsItems));
             Assert.IsTrue(newsItems.First().TotalRate / newsItems.First().RateCount >= leastAverage);
         }
 
         [TestMethod]
-        public void PutNewsItem_NoContent()
+        public void PutNewsItem_OK() // difficult to understand whether this test checks the scenario if a client behavior is correct
         {
             // Arrange
             var controller = new NewsItemsController();
 
             // Act
-            var response = (StatusCodeResult)controller.PutNewsItem(1, new XsollaSummerSchoolTest.NewsItem { Headline = "Test put", Body = "Test put", Category = "Test" });
+            var response = (StatusCodeResult)controller.PutNewsItem(1, new NewsItem
+            {
+                Headline = "Test put", 
+                Body = "Test put", 
+                Category = "Test"
+            });
 
             // Assert
             Assert.AreEqual(HttpStatusCode.NoContent, response.StatusCode);
+            // might be a good idea to check whether the operation was successful or not
         }
 
         [TestMethod]
-        public void PutNewsItem_NotFound()
+        public void PutNewsItem_FailNotFound()
         {
             // Arrange
             var controller = new NewsItemsController();
 
             // Act
-            var response = controller.PutNewsItem(-4, new XsollaSummerSchoolTest.NewsItem { Headline = "Test put", Body = "Test put", Category = "Test" });
+            var response = controller.PutNewsItem(-4, new NewsItem
+            {
+                Headline = "Test put", 
+                Body = "Test put", 
+                Category = "Test"
+            });
             var result = response as NotFoundResult;
 
             // Assert
@@ -120,7 +132,7 @@ namespace NewsApiTests
         }
 
         [TestMethod]
-        public void PutNewsItem_BadRequest()
+        public void PutNewsItem_FailBadRequest()
         {
             // Arrange
             var controller = new NewsItemsController();
@@ -138,16 +150,21 @@ namespace NewsApiTests
         }
 
         [TestMethod]
-        public void PostNewsItem_BadRequest()
+        public void PostNewsItem_FailBadRequest()
         {
             // Arrange
             var controller = new NewsItemsController();
             controller.Request = new HttpRequestMessage();
             controller.Configuration = new HttpConfiguration();
+            //Controller creation has to be reused
             controller.ModelState.AddModelError("Body", "The Body field is required.");
 
             // Act
-            var response = controller.PostNewsItem(new XsollaSummerSchoolTest.NewsItem { Headline = "Test post", Category = "Test" });
+            var response = controller.PostNewsItem(new NewsItem
+            {
+                Headline = "Test post", 
+                Category = "Test"
+            });
             var result = response as InvalidModelStateResult;
 
             // Assert
@@ -155,7 +172,7 @@ namespace NewsApiTests
         }
 
         [TestMethod]
-        public void PostNewsItem_CreatedAtRoute()
+        public void PostNewsItem_OK()
         {
             // Arrange
             var controller = new NewsItemsController();
@@ -163,7 +180,12 @@ namespace NewsApiTests
             controller.Configuration = new HttpConfiguration();
 
             // Act
-            var response = controller.PostNewsItem(new XsollaSummerSchoolTest.NewsItem { Headline = "Test post", Body = "Test post", Category = "Test" });
+            var response = controller.PostNewsItem(new NewsItem
+            {
+                Headline = "Test post", 
+                Body = "Test post", 
+                Category = "Test"
+            });
             var result = response as CreatedAtRouteNegotiatedContentResult<NewsItemSend>;
 
             // Assert
@@ -173,7 +195,7 @@ namespace NewsApiTests
         }
 
         [TestMethod]
-        public void DeleteNewsItem_NotFound()
+        public void DeleteNewsItem_FailNotFound()
         {
             // Arrange
             var controller = new NewsItemsController();
@@ -189,7 +211,7 @@ namespace NewsApiTests
         }
 
         [TestMethod]
-        public void DeleteNewsItem_Ok()
+        public void DeleteNewsItem_OK()
         {
             // Arrange
             var controller = new NewsItemsController();
@@ -205,7 +227,7 @@ namespace NewsApiTests
         }
 
         [TestMethod]
-        public void PostRate_NotFound()
+        public void PostRate_FailNotFound()
         {
             // Arrange
             var controller = new NewsItemsController();
@@ -220,7 +242,7 @@ namespace NewsApiTests
         }
 
         [TestMethod]
-        public void PostRate_BadRequest()
+        public void PostRate_FailBadRequest()
         {
             // Arrange
             var controller = new NewsItemsController();
@@ -235,24 +257,25 @@ namespace NewsApiTests
         }
 
         [TestMethod]
-        public void PostRate_Ok()
+        public void PostRate_OK()
         {
             // Arrange
             var controller = new NewsItemsController();
             controller.Request = new HttpRequestMessage();
             controller.Configuration = new HttpConfiguration();
-            controller.Request.Headers.Add("sessionString", "i71S2pE8tJ5LV0F658HCXK2zF57M3L");
-            controller.Request.RequestUri = new Uri("https://localhost:44341/api/");
+            controller.Request.Headers.Add("sessionString", "i71S2pE8tJ5LV0F658HCXK2zF57M3L"); // nit: might be a good idea to generate that one prior 
+            controller.Request.RequestUri = new Uri("https://localhost:44341/api/"); 
 
             // Act
             var response = controller.PostRate(2, 8);
 
             // Assert            
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            // nit: might be a good idea to check if that rate changed anything
         }
 
         [TestMethod]
-        public void PostRate_Forbidden()
+        public void PostRate_FailForbidden()
         {
             // Arrange
             var controller = new NewsItemsController();
@@ -271,7 +294,7 @@ namespace NewsApiTests
 
 
         [TestMethod]
-        public void DeleteRate_Ok()
+        public void DeleteRate_OK()
         {
             // Arrange
             var controller = new NewsItemsController();
@@ -286,10 +309,11 @@ namespace NewsApiTests
 
             // Assert            
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            // nit: might be a good idea to check if that rate cancellation changed anything
         }
 
         [TestMethod]
-        public void DeleteRate_Forbidden()
+        public void DeleteRate_FailForbidden()
         {
             // Arrange
             var controller = new NewsItemsController();
@@ -306,7 +330,7 @@ namespace NewsApiTests
         }
 
         [TestMethod]
-        public void DeleteRate_NotFound()
+        public void DeleteRate_FailNotFound()
         {
             // Arrange
             var controller = new NewsItemsController();
