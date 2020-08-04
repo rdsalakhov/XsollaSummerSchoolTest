@@ -15,9 +15,9 @@ namespace XsollaSummerSchoolTest.Controllers
 {
     public class NewsItemsController : ApiController
     {
-        private NewsDataModelContainer db = new NewsDataModelContainer();
+        private NewsDataModelContainer db = new NewsDataModelContainer(); // use DI to work with mock context for testing
 
-        private static int MaxMark = 10;
+        private static int MaxMark = 10; // are these really the properties connected to news items? SRP
         private static int MinMark = 1;
 
         // GET: api/NewsItems
@@ -26,24 +26,23 @@ namespace XsollaSummerSchoolTest.Controllers
             var rawNews = db.NewsItemSet.ToList();
             var news = rawNews.Select(x => (NewsItemSend)x);
             var response = Request.CreateResponse(HttpStatusCode.OK, news);
-            response.Headers.Add("News-count", news.Count().ToString());
+            response.Headers.Add("News-count", news.Count().ToString()); // unconventional name for the custom response header
             return response;
         }
 
         // GET: api/NewsItems?category
-        [Route("api/NewsItems/FindByCategory")]
+        [Route("api/NewsItems/FindByCategory")] // might be a good idea to merge the routing for that request with the one above so to have one endpoint
         public HttpResponseMessage GetNewsItemSet(string category)
         {
             var rawNews = db.NewsItemSet.ToList().Where(x => x.Category == category);
             var news = rawNews.Select(x => (NewsItemSend)x);
             var response = Request.CreateResponse(HttpStatusCode.OK, news);
             response.Headers.Add("News-count", news.Count().ToString());
-            
             return response;
         }
 
         // GET: api/NewsItems?LeastAverage
-        [Route("api/NewsItems/FindTopRated")]
+        [Route("api/NewsItems/FindTopRated")] // the same as above
         public HttpResponseMessage GetNewsItemSet(double leastAverage)
         {
             var rawNews = db.NewsItemSet.ToList().Where(x => x.Rate.Count > 0);
@@ -106,6 +105,8 @@ namespace XsollaSummerSchoolTest.Controllers
 
         // POST: api/NewsItem/PostRate/5
         [Route("api/NewsItems/postrate/{id}")]
+        // SRP problem. Might be a good idea to create RateController with obvious routing (api/Rates with HTTP verbs for CRUD)
+        // long method. might be a good idea to decompose (cookie checks + BL errors + action)
         public HttpResponseMessage PostRate(int id, short mark)
         {
             NewsItem newsItem = db.NewsItemSet.Find(id);
@@ -116,17 +117,17 @@ namespace XsollaSummerSchoolTest.Controllers
             if (mark > MaxMark || mark < MinMark)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
-                    $"Mark was out of available range. Mark should be between {MinMark} and {MaxMark}");
+                    $"Mark was out of available range. Mark should be between {MinMark} and {MaxMark}"); // BL errors might use AppException with custom message. 
             }
-            CookieHeaderValue cookie = Request.Headers.GetCookies("sessionstring").FirstOrDefault();
-            if (cookie == null)
+            CookieHeaderValue cookie = Request.Headers.GetCookies("sessionstring").FirstOrDefault(); 
+            if (cookie == null) 
             {
                 string sessionString = GetRandomString();
                 newsItem.Rate.Add(new Rate { Mark = mark, SessionString = sessionString });
                 db.SaveChanges();
                 var response = Request.CreateResponse(HttpStatusCode.OK);
                 cookie = new CookieHeaderValue("sessionstring", sessionString); 
-                cookie.Expires = DateTimeOffset.Now.AddDays(1); 
+                cookie.Expires = DateTimeOffset.Now.AddDays(1); // expiration date as literal 
                 cookie.Domain = Request.RequestUri.Host; 
                 cookie.Path = "/";
                 response.Headers.AddCookies(new CookieHeaderValue[] { cookie });
@@ -164,7 +165,11 @@ namespace XsollaSummerSchoolTest.Controllers
         }
 
         // DELETE: api/NewsItem/DeleteRate/5
+        // long method
+        // SRP problem. Might be a good idea to create RateController with obvious routing (api/Rates with HTTP verbs for CRUD)
+        // long method. might be a good idea to decompose (cookie checks + BL errors + action)
         [Route("api/NewsItems/deleterate/{id}")]
+        
         public HttpResponseMessage DeleteRate(int id)
         {
             NewsItem newsItem = db.NewsItemSet.Find(id);
@@ -206,7 +211,8 @@ namespace XsollaSummerSchoolTest.Controllers
         {
             return db.NewsItemSet.Count(e => e.Id == id) > 0;
         }
-
+        
+        // is that the method for news items? SRP 
         private string GetRandomString()
         {
             string s = "";
